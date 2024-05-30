@@ -1,0 +1,67 @@
+---
+format_version: '11'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: react-native
+workflows:
+  vision-camera:
+    description: |
+      Runs tests.
+
+      Next steps:
+      - Check out [Getting started with React Native apps](https://devcenter.bitrise.io/en/getting-started/getting-started-with-react-native-apps.html).
+    steps:
+    - activate-ssh-key@4: {}
+    - git-clone@6: {}
+    - yarn@0:
+        inputs:
+        - cache_local_deps: 'yes'
+        - workdir: "$WORKDIR"
+    - script@1:
+        inputs:
+        - script_file_path:
+        - content: |-
+            #!/usr/bin/env bash
+            yarn patch-package
+    - android-build@1:
+        inputs:
+        - module: app
+        - variant: release
+        - project_location: "$BITRISE_SOURCE_DIR/android"
+        - build_type: aab
+    meta:
+      bitrise.io:
+        stack: linux-docker-android-22.04
+        machine_type_id: standard
+meta:
+  bitrise.io:
+    stack: osx-xcode-15.0.x
+    machine_type_id: g2-m1.4core
+app:
+  envs:
+  - WORKDIR: "."
+    opts:
+      is_expand: false
+  - opts:
+      is_expand: false
+    PROJECT_LOCATION: android
+  - opts:
+      is_expand: false
+    MODULE: app
+  - opts:
+      is_expand: false
+    VARIANT: release
+  - opts:
+      is_expand: false
+    BITRISE_PROJECT_PATH: ios/Onetrace.xcworkspace
+  - opts:
+      is_expand: false
+    BITRISE_SCHEME: Onetrace
+  - opts:
+      is_expand: false
+    BITRISE_DISTRIBUTION_METHOD: app-store
+  - opts:
+      is_expand: false
+    _JAVA_OPTIONS: "-Xms2048m -Xmx2048m"
+  - opts:
+      is_expand: false
+    GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"
